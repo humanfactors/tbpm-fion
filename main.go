@@ -4,14 +4,22 @@ import (
 	"bufio"
 	"encoding/csv"
 	"fmt"
-	"log"
 	"os"
 	"strings"
 	"time"
 
+	"github.com/Sirupsen/logrus"
 	"golang.org/x/text/encoding/unicode"
 	"golang.org/x/text/transform"
 )
+
+var log = logrus.New()
+
+func checkError(message string, err error) {
+	if err != nil {
+		log.Fatal(message, err)
+	}
+}
 
 type Trial struct {
 	subject       string
@@ -26,7 +34,6 @@ type Trial struct {
 }
 
 var allkeyvars = []string{"TBTrialList:", "LDTrialList:", "PracTrialList:", "Procedure:", "Stimulus2.ACC:", "Stimulus.ACC:", "Stimulus.RESP:", "Stimulus.CRESP:", "Stimulus2.RESP:", "Stimulus2.CRESP:", "Stimuli:", "Stimulus.RT:", "Stimulus2.RT:"}
-
 var searchmap = map[string]string{
 	"Procedure:":       "procedure",
 	"TBTrialList:":     "trialnumber",
@@ -58,7 +65,19 @@ func MatchVars(line string, varlist []string) (match string, found bool) {
 
 func main() {
 
+	// Setup logging output file
+	logfile, err := os.OpenFile("debugging.log", os.O_CREATE|os.O_WRONLY, 0666)
+	if err == nil {
+		log.Out = logfile
+	} else {
+		log.Info("Failed to log to file, using default stderr")
+	}
+
+	// Log file processed and generate output name
 	filename := fmt.Sprintf("processed-%s.csv", time.Now().Format("2006-01-02"))
+	log.Info("[Processing : %s]", filename)
+	
+	// Create output file writer
 	file, err := os.Create(filename)
 	checkError("Cannot create file", err)
 	defer file.Close()
@@ -66,15 +85,14 @@ func main() {
 	defer writer.Flush()
 	writer.Write([]string{"subj", "procedure", "trial", "stimulus", "correctanswer", "selectedresponse", "correct", "rt"})
 
+	// For each file dragged onto the executable
 	for _, file := range os.Args {
 		fmt.Println("Processing subject %s", file)
+
 		data, err := NewScannerUTF16(file)
-		if err != nil {
-			log.Fatal(err)
-		}
+		checkError("Data file not in UTF16", err)
 
 		scanner := bufio.NewScanner(data)
-
 		if err := scanner.Err(); err != nil {
 			fmt.Fprintln(os.Stderr, "reading inputfile:", err)
 		}
@@ -83,7 +101,6 @@ func main() {
 
 		for scanner.Scan() {
 			line := scanner.Text()
-
 			if strings.Contains(line, "Subject:") {
 				subject = strings.Fields(line)[len(strings.Fields(line))-1]
 				thistrial.subject = subject
@@ -93,7 +110,6 @@ func main() {
 
 				split := strings.Fields(line)
 				value := split[len(split)-1]
-
 				if len(split) < 2 {
 					value = "NA"
 				}
@@ -106,7 +122,7 @@ func main() {
 
 					if strings.Contains(searchmap[linevar], "procedure") {
 						thistrial.procedure = value
-					}
+					} 
 					if strings.Contains(searchmap[linevar], "stimulus") {
 						thistrial.stimulus = value
 					}
@@ -176,10 +192,4 @@ func NewScannerUTF16(filename string) (utfScanner, error) {
 	// Make a Reader that uses utf16bom:
 	unicodeReader := transform.NewReader(file, utf16bom)
 	return unicodeReader, nil
-}
-
-func checkError(message string, err error) {
-	if err != nil {
-		log.Fatal(message, err)
-	}
 }
