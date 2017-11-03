@@ -62,7 +62,7 @@ func (p Participant) TrialPMScore(pmnumber int) (pmvalue float64) {
 		if pmnumber == 3 && trial.pm3 == 1 {
 			pmvalue = 1
 		}
-		if pmnumber == 6 && trial.pm6 == 1 {
+		if pmnumber == 7 && trial.pm7 == 1 {
 			pmvalue = 1
 		}
 		if pmnumber == 9 && trial.pm9 == 1 {
@@ -73,7 +73,7 @@ func (p Participant) TrialPMScore(pmnumber int) (pmvalue float64) {
 }
 
 func (p Participant) TotalPMScore() (totalpm float64) {
-	totalpm, _ = stats.Sum([]float64{p.TrialPMScore(3), p.TrialPMScore(6), p.TrialPMScore(9)})
+	totalpm, _ = stats.Sum([]float64{p.TrialPMScore(3), p.TrialPMScore(7), p.TrialPMScore(9)})
 	totalpm = totalpm / 3
 	return totalpm
 }
