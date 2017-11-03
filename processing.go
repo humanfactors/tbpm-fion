@@ -177,7 +177,7 @@ func ProcessKeyValue(measuretype string, value string, trial *Trial) {
 }
 
 func processPMResponse(pmresponseclock string) (pmresponse string, pmnumber int) {
-	clocktimes := []string{"00:03:00", "00:06:00", "00:09:00"}
+	clocktimes := []string{"00:03:00", "00:07:00", "00:09:00"}
 	clockindex := []int{3, 6, 9}
 	pmresponse = "falsealarm"
 	pmnumber = 0
