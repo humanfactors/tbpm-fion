@@ -54,7 +54,7 @@ func main() {
 		"Accuacy_PracTrialProc", "CorrectRT_PracTrialProc", "IncorrectRT_PracTrialProc",
 		"Accuacy_LDTrialProc", "CorrectRT_LDTrialProc", "IncorrectRT_LDTrialProc",
 		"Accuacy_TBTrialProc", "CorrectRT_TBTrialProc", "IncorrectRT_TBTrialProc", "ClockChecks_TOTAL",
-		"FalseAlarm_TOTAL", "PM_3min", "PM_6min", "PM_9min", "PM_TOTAL"})
+		"FalseAlarm_TOTAL", "PM_3min", "PM_7min", "PM_9min", "PM_TOTAL"})
 
 	// For all arguments, process file and then write out results
 	for _, file := range os.Args[1:] {
@@ -78,7 +78,7 @@ func main() {
 			strconv.FormatFloat(thissubject.ClockChecks("TBTrialProc"), 'f', 1, 64),
 			strconv.FormatFloat(thissubject.FalseAlarms("TBTrialProc"), 'f', 1, 64),
 			strconv.FormatFloat(thissubject.TrialPMScore(3), 'f', 1, 64),
-			strconv.FormatFloat(thissubject.TrialPMScore(6), 'f', 1, 64),
+			strconv.FormatFloat(thissubject.TrialPMScore(7), 'f', 1, 64),
 			strconv.FormatFloat(thissubject.TrialPMScore(9), 'f', 1, 64),
 			strconv.FormatFloat(thissubject.TotalPMScore(), 'f', 3, 64),
 		}
