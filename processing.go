@@ -29,7 +29,7 @@ type Trial struct {
 	clockcheck    float64
 	falsealarm    float64
 	pm3           float64
-	pm6           float64
+	pm7           float64
 	pm9           float64
 }
 
@@ -163,8 +163,8 @@ func ProcessKeyValue(measuretype string, value string, trial *Trial) {
 		if pmnumber == 3 && pmresponse == "correct" {
 			trial.pm3 = 1
 		}
-		if pmnumber == 6 && pmresponse == "correct" {
-			trial.pm6 = 1
+		if pmnumber == 7 && pmresponse == "correct" {
+			trial.pm7 = 1
 		}
 		if pmnumber == 9 && pmresponse == "correct" {
 			trial.pm9 = 1
@@ -178,7 +178,7 @@ func ProcessKeyValue(measuretype string, value string, trial *Trial) {
 
 func processPMResponse(pmresponseclock string) (pmresponse string, pmnumber int) {
 	clocktimes := []string{"00:03:00", "00:07:00", "00:09:00"}
-	clockindex := []int{3, 6, 9}
+	clockindex := []int{3, 7, 9}
 	pmresponse = "falsealarm"
 	pmnumber = 0
 	for index, atime := range clocktimes {
