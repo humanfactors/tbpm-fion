@@ -1,3 +1,6 @@
+// TBPM-FION is an eprime extraction utilitity for a specific experimental design
+// Run by the neuropsychology department at UWA.
+
 package main
 
 import (
