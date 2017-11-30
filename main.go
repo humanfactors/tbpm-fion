@@ -22,12 +22,17 @@ func checkError(message string, err error) {
 }
 
 // Determine Participant ABI or Control
-var pStatus = regexp.MustCompile(".*?(control|abi).*?")
+var pStatus = regexp.MustCompile(".*?([0-9]{4}).*?")
 
 func getParticipantStatus(filename string) (status string) {
-	status = pStatus.FindStringSubmatch(filename)[1]
-	if status != "control" && status != "abi" {
-		status = "filename did not contain control or abi"
+	statusnum := pStatus.FindStringSubmatch(filename)[1][0]
+	switch statusnum {
+	case "1"[0]:
+		status = "ABI"
+	case "2"[0]:
+		status = "Control"
+	default:
+		status = "UnableToGenerate"
 	}
 	return status
 }
@@ -50,11 +55,10 @@ func main() {
 	defer file.Close()
 	writer := csv.NewWriter(file)
 	defer writer.Flush()
-	writer.Write([]string{"subj", "status", "testdate",
-		"Accuacy_PracTrialProc", "CorrectRT_PracTrialProc", "IncorrectRT_PracTrialProc",
-		"Accuacy_LDTrialProc", "CorrectRT_LDTrialProc", "IncorrectRT_LDTrialProc",
-		"Accuacy_TBTrialProc", "CorrectRT_TBTrialProc", "IncorrectRT_TBTrialProc", "ClockChecks_TOTAL",
-		"FalseAlarm_TOTAL", "PM_3min", "PM_7min", "PM_9min", "PM_TOTAL"})
+	writer.Write([]string{"id", "status", "testdate",
+		"Accuacy_PracTrialProc", "CorrectRT_PracTrialProc", "IncorrectRT_PracTrialProc", "TotalNonResponses_PracTrialProc",
+		"Accuacy_LDTrialProc", "CorrectRT_LDTrialProc", "IncorrectRT_LDTrialProc", "TotalNonResponses_LDTrialProc",
+		"Accuacy_TBTrialProc", "CorrectRT_TBTrialProc", "IncorrectRT_TBTrialProc", "TotalNonResponses_TBTrialProc", "ClockChecks_TOTAL", "FalseAlarm_TOTAL", "PM_3min", "PM_7min", "PM_9min", "PM_TOTAL"})
 
 	// For all arguments, process file and then write out results
 	for _, file := range os.Args[1:] {
@@ -66,15 +70,18 @@ func main() {
 			thissubject.id,
 			thissubject.status,
 			thissubject.sessiondate,
-			strconv.FormatFloat(thissubject.AverageAccuracy("PracTrialProc"), 'f', 10, 64),
-			strconv.FormatFloat(thissubject.AverageCorrectRT("PracTrialProc", "correct"), 'f', 10, 64),
-			strconv.FormatFloat(thissubject.AverageCorrectRT("PracTrialProc", "incorrect"), 'f', 10, 64),
-			strconv.FormatFloat(thissubject.AverageAccuracy("LDTrialProc"), 'f', 10, 64),
-			strconv.FormatFloat(thissubject.AverageCorrectRT("LDTrialProc", "correct"), 'f', 10, 64),
-			strconv.FormatFloat(thissubject.AverageCorrectRT("LDTrialProc", "incorrect"), 'f', 10, 64),
-			strconv.FormatFloat(thissubject.AverageAccuracy("TBTrialProc"), 'f', 10, 64),
-			strconv.FormatFloat(thissubject.AverageCorrectRT("TBTrialProc", "correct"), 'f', 10, 64),
-			strconv.FormatFloat(thissubject.AverageCorrectRT("TBTrialProc", "incorrect"), 'f', 10, 64),
+			strconv.FormatFloat(thissubject.AverageAccuracy("PracTrialProc"), 'f', 4, 64),
+			strconv.FormatFloat(thissubject.AverageRT("PracTrialProc", "correct"), 'f', 4, 64),
+			strconv.FormatFloat(thissubject.AverageRT("PracTrialProc", "incorrect"), 'f', 4, 64),
+			strconv.FormatFloat(thissubject.TotalNonResponseTrials("PracTrialProc"), 'f', 1, 64),
+			strconv.FormatFloat(thissubject.AverageAccuracy("LDTrialProc"), 'f', 4, 64),
+			strconv.FormatFloat(thissubject.AverageRT("LDTrialProc", "correct"), 'f', 4, 64),
+			strconv.FormatFloat(thissubject.AverageRT("LDTrialProc", "incorrect"), 'f', 4, 64),
+			strconv.FormatFloat(thissubject.TotalNonResponseTrials("LDTrialProc"), 'f', 1, 64),
+			strconv.FormatFloat(thissubject.AverageAccuracy("TBTrialProc"), 'f', 4, 64),
+			strconv.FormatFloat(thissubject.AverageRT("TBTrialProc", "correct"), 'f', 4, 64),
+			strconv.FormatFloat(thissubject.AverageRT("TBTrialProc", "incorrect"), 'f', 4, 64),
+			strconv.FormatFloat(thissubject.TotalNonResponseTrials("TBTrialProc"), 'f', 1, 64),
 			strconv.FormatFloat(thissubject.ClockChecks("TBTrialProc"), 'f', 1, 64),
 			strconv.FormatFloat(thissubject.FalseAlarms("TBTrialProc"), 'f', 1, 64),
 			strconv.FormatFloat(thissubject.TrialPMScore(3), 'f', 1, 64),

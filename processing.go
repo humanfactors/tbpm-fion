@@ -152,6 +152,9 @@ func ProcessKeyValue(measuretype string, value string, trial *Trial) {
 	if measuretype == "procedure" {
 		trial.procedure = value
 	}
+	if measuretype == "response" {
+		trial.response = value
+	}
 	if measuretype == "accuracy" {
 		trial.accuracy, _ = strconv.ParseFloat(value, 64)
 	}

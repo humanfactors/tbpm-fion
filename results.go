@@ -4,18 +4,17 @@ import (
 	"github.com/montanaflynn/stats"
 )
 
-func (p Participant) AverageCorrectRT(procedure string, responsetype string) float64 {
+func (p Participant) AverageRT(procedure string, responsetype string) float64 {
 	var rttype float64
-	if responsetype == "correct" {
+	switch responsetype {
+	case "correct":
 		rttype = 1
-	} else {
-		if responsetype == "incorrect" {
-			rttype = 0
-		}
+	case "incorrect":
+		rttype = 0
 	}
 	rts := []float64{}
 	for _, trial := range p.trials {
-		if trial.accuracy == rttype && trial.procedure == procedure {
+		if trial.accuracy == rttype && trial.procedure == procedure && trial.response != "NA" {
 			rts = append(rts, trial.rt)
 		}
 	}
@@ -43,6 +42,15 @@ func (p Participant) FalseAlarms(procedure string) float64 {
 	}
 	meanfas, _ := stats.Sum(fas)
 	return meanfas
+}
+
+func (p Participant) TotalNonResponseTrials(procedure string) (nonresponses float64) {
+	for _, trial := range p.trials {
+		if trial.procedure == procedure && trial.response == "NA" {
+			nonresponses++
+		}
+	}
+	return nonresponses
 }
 
 func (p Participant) ClockChecks(procedure string) float64 {
